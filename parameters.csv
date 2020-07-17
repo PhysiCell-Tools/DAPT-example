@@ -1,0 +1,4 @@
+id,status,start-time,end-time,comment,./overall/max_time,./user_parameters/attached_worker_migration_bias,./user_parameters/unattached_worker_migration_bias
+default,,,,,2880,1.0,0.5
+attached-random,,,,,2880,0.1,1.0
+unattached-random,,,,,2880,1.0,0.1
