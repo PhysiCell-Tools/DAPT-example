@@ -3,17 +3,19 @@ import dapt
 
 config = dapt.Config(path='config.json')
 db = dapt.db.Delimited_file('parameters.csv', delimiter=',')
-ap = dapt.Param(db, config=config)
+params = dapt.Param(db, config=config)
 
-parameters = ap.next_parameters()
+p = params.next_parameters()
 
-while parameters is not None:
-    dapt.tools.create_XML(parameters, default_settings="PhysiCell_settings_default.xml", save_settings="PhysiCell_settings.xml")
+while p is not None:
+    dapt.tools.create_XML(p, default_settings="PhysiCell_settings_default.xml", save_settings="PhysiCell_settings.xml")
+
+    params.update_status(p["id"], 'running simulation')
 
     if platform.system() == 'Windows':
         os.system("biorobots.exe")
     else:
         os.system("./biorobots")
 
-    ap.successful(parameters["id"])
-    parameters = ap.next_parameters()
+    params.successful(p["id"])
+    p = params.next_parameters()
