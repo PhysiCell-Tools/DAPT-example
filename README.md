@@ -13,8 +13,9 @@ For these examples, three tests will be ran.  The first, `default`, uses the def
 Before setting up these examples, make sure that you can run PhysiCell by consulting the [Quickstart Guide](https://github.com/MathCancer/PhysiCell/blob/master/Quickstart.pdf).  Once you have confirmed that you can compile and run PhysiCell, open Terminal or CMD and type the following:
 
 ```
-git clone https://github.com/BenSDuggan/PhysiCell_DAPT_Example
-make -C PhysiCell_DAPT_Example/PhysiCell
+git clone https://github.com/PhysiCell-Tools/DAPT-example
+cd DAPT-example
+make -C PhysiCell
 pip install dapt
 ```
 
@@ -30,6 +31,21 @@ pip install dapt
 ├── reset.py                        # Python script that removes files created by examples
 └── parameters.csv                  # Parameters used for by each example, not used directly
 ```
+
+## How to run an example
+
+Each of the examples can be ran in the same way.  The Python script you run will change depending on which example you are running.  To run an example, type the following commands into the terminal from inside the root directory.
+
+1. `make`
+2. `python [example name]` (e.g. `python basic.py`)
+
+The data generted by PhysiCell will be placed in the output folder.
+
+To reset after running an example, run the following commands in the terminal from inside the root directory.
+
+1. `make data-cleanup` (removes data generated from simulation)
+2. `make clean` (removes object and executable files)
+3. `make reset` (resets the DAPT example to how they originally came)
 
 ## Basic Example
 
