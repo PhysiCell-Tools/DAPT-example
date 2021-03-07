@@ -27,8 +27,7 @@ pip install dapt
 ├── basic.py                        # Simplest example using DAPT with PhysiCell
 ├── outputs                         # Directory where output from the pipeline is saved
 ├── paper_example.py                # Example used in the paper demonstrating use of a config file with DAPT
-├── parameters.csv                  # Parameters used for by each example, not used directly
-└── sheet.py                        # Example showing how to combine cloud services like Google Sheets with DAPT
+└── parameters.csv                  # Parameters used for by each example, not used directly
 ```
 
 ## How to run an example
