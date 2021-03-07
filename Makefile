@@ -153,9 +153,6 @@ clean:
 	cp backup/PhysiCell_settings.xml .
 	
 data-cleanup:
-	rm -f *.mat
-	rm -f *.xml
-	rm -f *.svg
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt

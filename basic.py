@@ -5,57 +5,10 @@ Basic DAPT and PhysiCell Example
 This script demonstrates the simplest example of parameter testing in PhysiCell using DAPT.
 """
 
-import os, platform, csv, shutil, dapt
+import csv, os, platform, shutil
 import xml.etree.ElementTree as ET
+import dapt
 
-def main(db_path):
-
-    # Set up DAPT objects: database (Delimited_file) and parameter manager (Param)
-    db = dapt.Delimited_file(db_path, delimiter=',')
-    ap = dapt.Param(db, config=None)
-
-    print("Starting main script")
-
-    # Get the first parameter.  Returns None if there are none
-    parameters = ap.next_parameters()
-
-    while parameters is not None:
-
-        print("Request parameters: %s" % parameters)
-
-        # Use a try/except to report errors if they occur during the pipeline
-        try:
-            # Reset PhysiCell from the previous run using PhysiCell's data-cleanup
-            print("Cleaning up folder")
-            ap.update_status(parameters['id'], 'clean')
-            os.system("make data-cleanup")
-
-            # Update the default settings with the given parameters
-            print("Creating parameters xml")
-            ap.update_status(parameters['id'], 'xml')
-            create_XML(parameters, default_settings="config/PhysiCell_settings_default.xml", save_settings="config/PhysiCell_settings.xml")
-
-            # Run PhysiCell (execution method depends on OS)
-            print("Running test")
-            ap.update_status(parameters['id'], 'sim')
-            if platform.system() == 'Windows':
-                os.system("biorobots.exe")
-            else:
-                os.system("./biorobots")
-
-            # Moving final image to output folder
-            ap.update_status(parameters['id'], 'output')
-            shutil.copyfile('output/final.svg', '../outputs/%s_final.svg' % parameters["id"])
-
-            # Update sheets to mark the test is finished
-            ap.successful(parameters["id"])
-
-        except ValueError:
-            print("Test failed:")
-            print(ValueError)
-            ap.failed(parameters["id"], ValueError)
-
-        parameters = ap.next_parameters() #Get the next parameter
 
  # This is the same method implimented in `dapt.tools.create_XML()`.  
  # The method was coppied here to make the code easier to read.
@@ -85,12 +38,49 @@ def create_XML(parameters, default_settings="PhysiCell_settings_default.xml", sa
 
     tree.write(save_settings)
 
-if __name__ == '__main__':
-    os.chdir('PhysiCell')
+# Set up DAPT objects: database (Delimited_file) and parameter manager (Param)
+db = dapt.Delimited_file('parameters.csv', delimiter=',')
+params = dapt.Param(db, config=None)
 
-    master_db_path = '../parameters.csv'
-    db_path = '../basic_params.csv'
+print("Starting main script")
 
-    shutil.copyfile(master_db_path, db_path)
+# Get the first parameter.  Returns None if there are none
+p = params.next_parameters()
 
-    main(db_path)
+while p is not None:
+
+    print("Request parameters: %s" % p)
+
+    # Use a try/except to report errors if they occur during the pipeline
+    try:
+        # Reset PhysiCell from the previous run using PhysiCell's data-cleanup
+        print("Cleaning up folder")
+        params.update_status(p['id'], 'clean')
+        os.system("make data-cleanup")
+
+        # Update the default settings with the given parameters
+        print("Creating parameters xml")
+        params.update_status(p['id'], 'xml')
+        create_XML(p, default_settings="backup/PhysiCell_settings.xml", save_settings="PhysiCell_settings.xml")
+
+        # Run PhysiCell (execution method depends on OS)
+        print("Running test")
+        params.update_status(p['id'], 'sim')
+        if platform.system() == 'Windows':
+            os.system("biorobots.exe")
+        else:
+            os.system("./biorobots")
+
+        # Moving final image to output folder
+        params.update_status(p['id'], 'output')
+        shutil.copyfile('output/final.svg', '%s_final.svg' % p["id"])
+
+        # Update sheets to mark the test is finished
+        params.successful(p["id"])
+
+    except ValueError:
+        print("Test failed:")
+        print(ValueError)
+        params.failed(p["id"], ValueError)
+
+    p = params.next_parameters() #Get the next parameter
