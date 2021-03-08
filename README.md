@@ -2,9 +2,9 @@
 
 This repository shows several examples of how to use the [Distributive Automated Parameter Testing](https://github.com/BenSDuggan/DAPT) (DAPT) package with [PhysiCell](https://github.com/MathCancer/PhysiCell) version 1.7.0.  DAPT makes parameter testing easy by making it easy to use APIs (e.g. Google Sheets and Box) to build a pipeline.  By connecting to "Databases", these tests can be run by many people simultaneously.  This repository contains examples of a simple example ([basic.py](basic.py)) and example with a configuration file ([paper_example.py](/paper_example.py)).
 
-The PhysiCell biorobots sample project is used in this tutorial.  You can interact with this model using the [biorobots NanoHub tool](https://nanohub.org/tools/pc4biorobots).  This sample project has three types of agents: cargo cells (blue), worker cells (red), and director cells (green).  The worker cells will move to cargo cells, attach to them, move the cargo cells to the directory cells, drop off them off, and then look for another cargo cell.  
+The PhysiCell biorobots sample project is used in this tutorial.  You can interact with this model using the [biorobots NanoHub tool](https://nanohub.org/tools/pc4biorobots).  This sample project has three types of agents: cargo cells (blue), worker cells (red), and director cells (green).  The worker cells will move to cargo cells, attach to them, move the cargo cells to the director cells, drop off them off, and then look for another cargo cell.  
 
-Two important parameters for this model are `attached_worker_migration_bias`, the motility bias when worker cells are attached to cargo cells, and `unattached_worker_migration_bias`, the motility bias when worker cells aren't attached to cargo cells.  When the bias is 1, the worker cells' strictly follow the chemotaxis signal, and when it's 0, the worker cell's motility direction is random.  Values between 0 and 1 allow cell motion to span between completely random and completely deterministic motion.
+Two important parameters for this model are `attached_worker_migration_bias`, the motility bias when worker cells are attached to cargo cells, and `unattached_worker_migration_bias`, the motility bias when worker cells aren't attached to cargo cells.  When the bias is 1, the worker cells strictly follow the chemotaxis signal, and when it's 0, the worker cell's motility direction is random.  Values between 0 and 1 allow cell motion to span between completely random and completely deterministic motion.
 
 For these examples, three tests will be run.  The first, `default`, uses the default parameters.  The second test, `attached`, sets unattached migration bias to 1 and attached bias to 0.1.  The third test, `unattached`, sets unattached migration bias to 0.1 and attached bias to 1.  A third parameter, `max_time` is included which allows the simulation time to easily be changed.  The examples below show how DAPT can be used to test these parameters.
 
@@ -141,7 +141,7 @@ os.system("mogrify -format png -path . outputs/%s_final.svg" % p['id'])
 
 ## Paper Example
 
-This is the example used in the DAPT paper.  It differs from the basic example in that it removes clutter and demonstrates the `Config` class.  Specifically, the `create_XML()` method is replaced by DAPT's method, the `try/except` block is removed, and the final output image is no longer saved.
+This is the example used in the DAPT paper.  It differs from the basic example in that it uses alternative methods to achieve similar goals and demonstrates the `Config` class.  Specifically, the `create_XML()` method is replaced by DAPT's method, the `try/except` block is removed, and the final output image is no longer saved.
 
 The `Config` class uses a JSON file to instructions on how DAPT should run.  In this example, the config is stored in a file named [config.json](/config.json).  Most classes accept a `Config` object and allow variables to be defined in the configuration, instead of in code.  The code block below shows how a `Config` class gets defined and used.
 
