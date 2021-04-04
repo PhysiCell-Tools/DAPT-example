@@ -10,7 +10,7 @@ For these examples, three tests will be run.  The first, `default`, uses the def
 
 ## Setup instructions
 
-Before setting up these examples, make sure that you can run PhysiCell by consulting the [Quickstart Guide](https://github.com/MathCancer/PhysiCell/blob/master/Quickstart.pdf).  Once you have confirmed that you can compile and run PhysiCell, open Terminal or CMD and type the following:
+Before setting up these examples, make sure that you can run PhysiCell by consulting the [Quickstart Guide](https://github.com/MathCancer/PhysiCell/blob/master/Quickstart.pdf).  If you have problems installing PhysiCell, please checkout the [PhysiCell forums](https://sourceforge.net/p/physicell/tickets/).  Once you have confirmed that you can compile and run PhysiCell, open Terminal or CMD and type the following:
 
 ```
 git clone https://github.com/PhysiCell-Tools/DAPT-example
@@ -154,3 +154,14 @@ params = dapt.Param(db, config=config)
 The config file in this example has two options: `{"last-test": null, "num-of-runs": -1}`.  The `last-test` setting is used to restart the last test you worked on if you quit DAPT.  The `num-of-runs` option defines the number of tests you would like to run.  For this example, all tests are being run (-1).
 
 This example will overwrite the data produced when the next test is started.  To save the final SVG output, add `shutil` to the import list.  Then insert `shutil.copyfile('output/final.svg', '%s_final.svg' % p["id"])` on line 19, before the next parameter set is retrieved.
+
+
+## Google Sheets Example
+
+It is very easy to add an online database to DAPT.  For example, Google Sheets can easily be added to allow an entire team to explored the parameter space corroboratively.
+
+First, you need to get your Google credentials and create a service account.  Follow the instruction from the [DAPT documentation](https://dapt.readthedocs.io/en/latest/services/sheets-setup.html).  After this step, you should have a credentials JSON file and the email of the service account.
+
+Next, make a new Google Sheet's document.  Share the Google Sheet with the service account email, and make sure the account has editing access.  Then copy down the spreadsheet ID from the URL.  For example, if `https://docs.google.com/spreadsheets/d/1OxUuXxuNtf8RV-GIPeXUx-4ER4eJfstk5hQzfqC-k/edit` is your URL, the spreadsheet ID would be `1OxUuXxuNtf8RV-GIPeXUx-4ER4eJfstk5hQzfqC-k`.
+
+Now open the [sheets_example.py](/sheets_example.py) file.  
