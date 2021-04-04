@@ -2,12 +2,12 @@ import os, platform
 import dapt, gspread
 
 # Update these variables
-spreedsheet_id = ''
-credentials_path = ''
+spreedsheet_id = '17QJFFXto0MbOX5dH9GFP3NevNHiuxj7eZf7Pevcg96U'
+credentials_path = '/Users/ben/Documents/mathcancer/configs/credentials.json'
 
 
 config = dapt.Config(path='config.json')
-db = dapt.db.Sheets(spreedsheet_id=spreedsheet_id, creds_path=credentials_path)
+db = dapt.db.Sheet(spreedsheet_id=spreedsheet_id, creds=credentials_path)
 db.connect()
 params = dapt.Param(db, config=config)
 

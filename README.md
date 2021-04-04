@@ -164,4 +164,8 @@ First, you need to get your Google credentials and create a service account.  Fo
 
 Next, make a new Google Sheet's document.  Share the Google Sheet with the service account email, and make sure the account has editing access.  Then copy down the spreadsheet ID from the URL.  For example, if `https://docs.google.com/spreadsheets/d/1OxUuXxuNtf8RV-GIPeXUx-4ER4eJfstk5hQzfqC-k/edit` is your URL, the spreadsheet ID would be `1OxUuXxuNtf8RV-GIPeXUx-4ER4eJfstk5hQzfqC-k`.
 
-Now open the [sheets_example.py](/sheets_example.py) file.  
+Now open the [sheets_example.py](/sheets_example.py) file.  Place the spreadsheet ID and path to the credentials in the `spreadsheet_id` and `credentials_path` variables, respectively.  
+
+This script functions the same as the [paper_example.py](/paper_example.py) script, but some pieces have been moved around.  First, the `Delimited_file` class has been switched out for the `Sheets` class.  Next, the section of code that gets and tests parameters (8-21), was moved to a method named `main()`.  Lastly, a method named `reset_spreadsheet()` was added to reset the Google Sheet after each run.
+
+Run the script by typing `python sheets_example.py` in the terminal.  You can examine the distributive aspect of DAPT by having multiple people or devices running this code at the same time.
