@@ -154,8 +154,9 @@ clean:
 	
 data-cleanup:
 	rm -rf ./output
-	mkdir ./output
-	touch ./output/empty.txt
+	mkdir ./output ./output/default ./output/attached ./output/unattached
+	touch ./output/empty.txt ./output/default/empty.txt ./output/attached/empty.txt ./output/unattached/empty.txt
+
 	cp backup/PhysiCell_settings.xml .
 	
 # archival 

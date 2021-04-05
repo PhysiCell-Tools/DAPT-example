@@ -30,6 +30,7 @@ def main():
     p = params.next_parameters()
 
     while p is not None:
+        p['./save/folder'] = 'output/%s' % p['id']
         dapt.tools.create_XML(p, default_settings="PhysiCell_settings_default.xml", save_settings="PhysiCell_settings.xml")
 
         params.update_status(p["id"], 'running simulation')
