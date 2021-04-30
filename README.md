@@ -65,12 +65,15 @@ The parameters used for this (and the other examples) are shown in the table bel
 
 This table is saved in [parameters.csv](/parameters.csv) and used by the example code.  This file is modified by the script and needs to be reset after running the code.  Run the script (`python basic.py`) and observe the results.  The outputs folder now contains three final output SVGs from the script.  To reset the parameters, run `make reset`.
 
+
+### Script overview
+
 Before explaining how the script works, you should look at it yourself to get an overview.  The script is broken into two blocks: `create_XML()` and the testing pipeline.  
 
 The first part of the script is importing all of the modules that will be needed.
 
 ```
-import csv, os, platform, shutil
+import os, platform
 import xml.etree.ElementTree as ET
 import dapt
 ```
@@ -84,51 +87,32 @@ params = dapt.Param(db, config=None)
 p = params.next_parameters()
 ```
 
-The next part of the code tests parameters until there are no more.  The parameters are tested in a `try`/`except` block to catch errors that occur.  If an error occurs, the `status` attribute for that test is set as `failed` and the `comment` attribute will contain the error.  The last part of the loop fetches the next parameter.  If there are no more parameters to run, the `dapt.Param.next_parameters()` method will return `None` and the loop will break.  Below is the code block that runs each parameter, with the testing code removed.
+The while loop contains the main pipeline code.  It will continue to execute until there are no more parameters to run (`dapt.Param.next_parameters()` is `None`).  There are two steps in the pipeline: change the parameters in the PhysiCell settings file and run the simulationFor each of these steps, the status of the database is updated to reflect which step is currently in progress.  This makes it easy to monitor what step the pipeline is on.  After the test is complete, the parameters must be marked as successful or failed.
 
 ```
 while p is not None:
+
     print("Request parameters: %s" % p)
 
-    try:
-        # Testing code here
-        pass
+    params.update_status(p["id"], 'updating PhysiCell settings')
 
-    except ValueError:
-        print("Test failed:")
-        print(ValueError)
-        params.failed(p["id"], ValueError)
+    # Update the default settings with the given parameters
+    create_XML(p, default_settings="PhysiCell_settings_default.xml", save_settings="PhysiCell_settings.xml")
 
+    params.update_status(p["id"], 'running simulation')
+
+    # Run PhysiCell (execution method depends on OS)
+    if platform.system() == 'Windows':
+        os.system("biorobots.exe")
+    else:
+        os.system("./biorobots")
+
+    # Update sheets to mark the test is finished
+    params.successful(p["id"])
+
+    #Get the next parameter
     p = params.next_parameters()
-```
 
-The `try` block, contains the main pipeline code.  There are four steps: clean the PhysiCell directory, change the parameters in the PhysiCell settings file, run the simulation, and copy the data to a new directory.  For each of these steps, the status of the database is updated to reflect which step is currently in progress.  This makes it easy to monitor what step the pipeline is on.  After the test is complete, the parameters must be marked as successful or failed.
-
-```
-# Reset PhysiCell from the previous run using PhysiCell's data-cleanup
-print("Cleaning up folder")
-params.update_status(p['id'], 'clean')
-os.system("make data-cleanup")
-
-# Update the default settings with the given parameters
-print("Creating parameters xml")
-params.update_status(p['id'], 'xml')
-create_XML(p, default_settings="backup/PhysiCell_settings.xml", save_settings="PhysiCell_settings.xml")
-
-# Run PhysiCell (execution method depends on OS)
-print("Running test")
-params.update_status(p['id'], 'sim')
-if platform.system() == 'Windows':
-    os.system("biorobots.exe")
-else:
-    os.system("./biorobots")
-
-# Moving final image to output folder
-params.update_status(p['id'], 'output')
-shutil.copyfile('output/final.svg', '%s_final.svg' % p["id"])
-
-# Update sheets to mark the test is finished
-params.successful(p["id"])
 ```
 
 Using this approach, additional steps can easily be added.  For example, if you wanted to convert the final image to a PNG you could add the following lines after the image is saved and before `ap.successful()` is called.  This requires [ImageMagick](https://imagemagick.org/index.php) to be installed.
@@ -141,7 +125,7 @@ os.system("mogrify -format png -path . outputs/%s_final.svg" % p['id'])
 
 ## Paper Example
 
-This is the example used in the DAPT paper.  It differs from the basic example in that it uses alternative methods to achieve similar goals and demonstrates the `Config` class.  Specifically, the `create_XML()` method is replaced by DAPT's method, the `try/except` block is removed, and the final output image is no longer saved.
+This is the example used in the DAPT paper.  It differs from the basic example in that it uses alternative methods to achieve similar goals and demonstrates the `Config` class.  Specifically, the `create_XML()` method is replaced by DAPT's method, comments have been removed, and print statements have also been removed.
 
 The `Config` class uses a JSON file to instructions on how DAPT should run.  In this example, the config is stored in a file named [config.json](/config.json).  Most classes accept a `Config` object and allow variables to be defined in the configuration, instead of in code.  The code block below shows how a `Config` class gets defined and used.
 
@@ -152,8 +136,6 @@ params = dapt.Param(db, config=config)
 ```
 
 The config file in this example has two options: `{"last-test": null, "num-of-runs": -1}`.  The `last-test` setting is used to restart the last test you worked on if you quit DAPT.  The `num-of-runs` option defines the number of tests you would like to run.  For this example, all tests are being run (-1).
-
-This example will overwrite the data produced when the next test is started.  To save the final SVG output, add `shutil` to the import list.  Then insert `shutil.copyfile('output/final.svg', '%s_final.svg' % p["id"])` on line 19, before the next parameter set is retrieved.
 
 
 ## Google Sheets Example
@@ -169,3 +151,8 @@ Now open the [sheets_example.py](/sheets_example.py) file.  Place the spreadshee
 This script functions the same as the [paper_example.py](/paper_example.py) script, but some pieces have been moved around.  First, the `Delimited_file` class has been switched out for the `Sheets` class.  Next, the section of code that gets and tests parameters (8-21), was moved to a method named `main()`.  Lastly, a method named `reset_spreadsheet()` was added to reset the Google Sheet after each run.
 
 Run the script by typing `python sheets_example.py` in the terminal.  You can examine the distributive aspect of DAPT by having multiple people or devices running this code at the same time.
+
+## General notes
+
+* These examples will overwrite the data produced when the next test is started.  To save the outputs to an individual folded inside the [output](/ouput) folder, add `p['./save/folder'] = 'output/%s' % p['id']` before calling the `create_XML()` method.
+* The [dont_overwrite.py](/dont_overwrite.py) script is the same as the [paper_example.py](/paper_example.py) script but will save the test outputs to a separate folder (using the method above).
